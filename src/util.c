@@ -101,12 +101,14 @@ static void
 in6_fillscopeid(struct sockaddr_in6 *sin6)
 {
 	u_int16_t ifindex;
+	u_int16_t *addr;
 
         if (IN6_IS_ADDR_LINKLOCAL(&sin6->sin6_addr)) {
-		ifindex = ntohs(*(u_int16_t *)&sin6->sin6_addr.s6_addr[2]);
+		addr = (u_int16_t *)&sin6->sin6_addr.s6_addr[2];
+		ifindex = ntohs(*addr);
 		if (sin6->sin6_scope_id == 0 && ifindex != 0) {
 			sin6->sin6_scope_id = ifindex;
-			*(u_int16_t *)&sin6->sin6_addr.s6_addr[2] = 0;
+			*addr = 0;
 		}
 	}
 }
