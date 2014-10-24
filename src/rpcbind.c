@@ -726,11 +726,9 @@ terminate(int dummy /*__unused*/)
 	unlink(_PATH_RPCBINDSOCK);
 	unlink(RPCBINDDLOCK);
 #ifdef WARMSTART
-	syslog(LOG_ERR,
-		"rpcbind terminating on signal. Restart with \"rpcbind -w\"");
 	write_warmstart();	/* Dump yourself */
 #endif
-	exit(2);
+	exit(0); /* exit gracefully */
 }
 
 void
