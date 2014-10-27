@@ -62,6 +62,7 @@
 #include <netconfig.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <grp.h>
 #include <syslog.h>
 #include <err.h>
 #include <pwd.h>
