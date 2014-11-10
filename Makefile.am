@@ -8,6 +8,7 @@ AM_CPPFLAGS = \
 	-DINET6 \
 	-DRPCBIND_STATEDIR="\"$(statedir)\"" \
 	-DRPCBIND_USER="\"$(rpcuser)\"" \
+	-DNSS_MODULES="\"$(nss_modules)\"" \
 	-D_GNU_SOURCE \
 	$(TIRPC_CFLAGS)
 

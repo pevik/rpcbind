@@ -91,6 +91,12 @@ char *rpcbinduser = RPCBIND_USER;
 char *rpcbinduser = NULL;
 #endif
 
+#ifdef NSS_MODULES
+char *nss_modules = NSS_MODULES;
+#else
+char *nss_modules = "files";
+#endif
+
 /* who to suid to if -s is given */
 #define RUN_AS  "daemon"
 
@@ -165,7 +171,7 @@ main(int argc, char *argv[])
 	 * Make sure we use the local service file 
 	 * for service lookkups
 	 */
-	__nss_configure_lookup("services", "files");
+	__nss_configure_lookup("services", nss_modules);
 
 	nc_handle = setnetconfig(); 	/* open netconfig file */
 	if (nc_handle == NULL) {
@@ -231,7 +237,7 @@ main(int argc, char *argv[])
 		 * Make sure we use the local password file
 		 * for these lookups.
 		 */
-		__nss_configure_lookup("passwd", "files");
+		__nss_configure_lookup("passwd", nss_modules);
 
 		if((p = getpwnam(id)) == NULL) {
 			syslog(LOG_ERR, "cannot get uid of '%s': %m", id);

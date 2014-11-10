@@ -27,6 +27,13 @@ AC_ARG_WITH([rpcuser],
   ,, [with_rpcuser=root])
 AC_SUBST([rpcuser], [$with_rpcuser])
  
+AC_ARG_WITH([nss_modules],
+  AS_HELP_STRING([--with-nss-modules=NSS_MODULES]
+  , [Sets the nss module search list to the given space-delimited string.
+     For example --with-nss-modules="files altfiles" @<:@default=files@:>@])
+  ,, [with_nss_modules=files])
+AC_SUBST([nss_modules], [$with_nss_modules])
+
 PKG_CHECK_MODULES([TIRPC], [libtirpc])
 
 AS_IF([test x$enable_libwrap = xyes], [
