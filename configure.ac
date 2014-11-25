@@ -36,6 +36,18 @@ AC_SUBST([nss_modules], [$with_nss_modules])
 
 PKG_CHECK_MODULES([TIRPC], [libtirpc])
 
+PKG_PROG_PKG_CONFIG
+AC_ARG_WITH([systemdsystemunitdir],
+  AS_HELP_STRING([--with-systemdsystemunitdir=DIR], [Directory for systemd service files]),
+  [], [with_systemdsystemunitdir=$($PKG_CONFIG --variable=systemdsystemunitdir systemd)])
+  if test "x$with_systemdsystemunitdir" != xno; then
+    AC_SUBST([systemdsystemunitdir], [$with_systemdsystemunitdir])
+     PKG_CHECK_MODULES([SYSTEMD], [libsystemd], [],
+	   [PKG_CHECK_MODULES([SYSTEMD], [libsystemd-daemon], [],
+	   AC_MSG_ERROR([libsystemd support requested but found]))])
+  fi
+AM_CONDITIONAL(SYSTEMD, [test -n "$with_systemdsystemunitdir" -a "x$with_systemdsystemunitdir" != xno ])
+
 AS_IF([test x$enable_libwrap = xyes], [
 	AC_CHECK_LIB([wrap], [hosts_access], ,
 		AC_MSG_ERROR([libwrap support requested but unable to find libwrap]))

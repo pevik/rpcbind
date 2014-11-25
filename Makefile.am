@@ -41,6 +41,12 @@ rpcbind_SOURCES = \
 	src/warmstart.c
 rpcbind_LDADD = $(TIRPC_LIBS)
 
+if SYSTEMD
+AM_CPPFLAGS += $(SYSTEMD_CFLAGS) -DSYSTEMD
+
+rpcbind_LDADD += $(SYSTEMD_LIBS)
+endif
+
 rpcinfo_SOURCES =       src/rpcinfo.c
 rpcinfo_LDADD   =       $(TIRPC_LIBS)
 
