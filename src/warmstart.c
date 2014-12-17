@@ -105,10 +105,11 @@ read_struct(char *filename, xdrproc_t structproc, void *list)
 	if (debugging)
 		fprintf(stderr, "rpcbind: using '%s' startup file\n", filename);
 
-	if (((fp = fopen(filename, "r")) == NULL) && errno != ENOENT) {
-		syslog(LOG_ERR,
-			"Cannot open '%s' file for reading, errno %d (%s)",
-			filename, errno, strerror(errno));
+	if ((fp = fopen(filename, "r")) == NULL) {
+		if (errno != ENOENT)
+			syslog(LOG_ERR,
+				"Cannot open '%s' file for reading, errno %d (%s)",
+				filename, errno, strerror(errno));
 		goto error;
 	}
 
