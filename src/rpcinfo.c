@@ -119,6 +119,7 @@ static CLIENT *clnt_com_create (struct sockaddr_in *, u_long, u_long, int *,
 				char *);
 static void pmapdump (int, char **);
 static void get_inet_address (struct sockaddr_in *, char *);
+static CLIENT *ip_getclient(const char *hostname, rpcprog_t prognum, rpcvers_t versnum, const char *proto);
 #endif
 
 static bool_t reply_proc (void *, struct netbuf *, struct netconfig *);
@@ -411,16 +412,15 @@ ip_ping_one(client, vers)
  * version 0 calls succeeds, it tries for MAXVERS call and repeats the same.
  */
 static void
-ip_ping (portnum, trans, argc, argv)
+ip_ping (portnum, proto, argc, argv)
      u_short portnum;
-     char *trans;
+     char *proto;
      int argc;
      char **argv;
 {
   CLIENT *client;
-  int fd = RPC_ANYFD;
-  struct sockaddr_in addr;
   enum clnt_stat rpc_stat;
+  const char *hostname;
   u_long prognum, vers, minvers, maxvers;
   struct rpc_err rpcerr;
   int failure = 0;
@@ -430,8 +430,9 @@ ip_ping (portnum, trans, argc, argv)
       usage ();
       exit (1);
     }
+
+  hostname = argv[0];
   prognum = getprognum (argv[1]);
-  get_inet_address (&addr, argv[0]);
   if (argc == 2)
     {				/* Version number not known */
       /*
@@ -444,8 +445,9 @@ ip_ping (portnum, trans, argc, argv)
     {
       vers = getvers (argv[2]);
     }
-  addr.sin_port = htons (portnum);
-  client = clnt_com_create (&addr, prognum, vers, &fd, trans);
+
+  client = ip_getclient(hostname, prognum, vers, proto);
+
   rpc_stat = ip_ping_one(client, vers);
   if (argc != 2)
     {
@@ -648,6 +650,76 @@ get_inet_address (addr, host)
     {
       addr->sin_family = AF_INET;
     }
+}
+
+/*
+ * Try to obtain the address of a given host/program/version, using the
+ * specified protocol (one of udp or tcp).
+ * This loops over all netconfig entries (according to the order given by
+ * netpath and the config file), and tries to resolve the hostname, and obtain
+ * the address using rpcb_getaddr.
+ */
+CLIENT *
+ip_getclient(hostname, prognum, versnum, proto)
+     const char *hostname;
+     rpcprog_t prognum;
+     rpcvers_t versnum;
+     const char *proto;
+{
+  void *handle;
+  enum clnt_stat saved_stat = RPC_SUCCESS;
+  struct netconfig *nconf, *result = NULL;
+  struct netbuf bind_address;
+  struct sockaddr_storage __sa;
+  CLIENT *client;
+
+  memset(&bind_address, 0, sizeof(bind_address));
+  bind_address.maxlen = sizeof(__sa);
+  bind_address.buf = &__sa;
+
+  handle = setnetconfig();
+  while ((nconf = getnetconfig(handle)) != NULL)
+    {
+      if (!strcmp(nconf->nc_proto, proto)) {
+        if (rpcb_getaddr(prognum, versnum, nconf, &bind_address, hostname))
+          {
+	    result = getnetconfigent(nconf->nc_netid);
+	    endnetconfig(handle);
+	    break;
+	  }
+
+        if (rpc_createerr.cf_stat != RPC_UNKNOWNHOST)
+          {
+            clnt_pcreateerror (hostname);
+	    exit (1);
+	  }
+
+	saved_stat = rpc_createerr.cf_stat;
+      }
+    }
+
+  if (result == NULL)
+    {
+      if (saved_stat != RPC_SUCCESS)
+        {
+          rpc_createerr.cf_stat = saved_stat;
+          clnt_pcreateerror (hostname);
+        }
+      else
+        fprintf (stderr, "Cannot find suitable transport for protocol %s\n", proto);
+
+      exit (1);
+    }
+
+  client = clnt_tli_create(RPC_ANYFD, result, &bind_address, prognum, versnum, 0, 0);
+  if (client == NULL)
+    {
+      clnt_pcreateerror(hostname);
+      exit (1);
+    }
+
+  freenetconfigent(result);
+  return client;
 }
 #endif /* PORTMAP */
 
