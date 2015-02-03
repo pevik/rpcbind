@@ -425,18 +425,6 @@ init_transport(struct netconfig *nconf)
 	if (my_xprt != NULL)
 		goto got_socket;
 
-	/*
-	 * XXX - using RPC library internal functions. For NC_TPI_CLTS
-	 * we call this later, for each socket we like to bind.
-	 */
-	if (nconf->nc_semantics != NC_TPI_CLTS) {
-		if ((fd = __rpc_nconf2fd(nconf)) < 0) {
-			syslog(LOG_ERR, "cannot create socket for %s",
-			    nconf->nc_netid);
-			return (1);
-		}
-	}
-
 	if ((strcmp(nconf->nc_netid, "local") == 0) ||
 	    (strcmp(nconf->nc_netid, "unix") == 0)) {
 		memset(&sun, 0, sizeof sun);
@@ -597,6 +585,12 @@ init_transport(struct netconfig *nconf)
 		if (!checkbind)
 			return 1;
 	} else {	/* NC_TPI_COTS */
+		if ((fd = __rpc_nconf2fd(nconf)) < 0) {
+			syslog(LOG_ERR, "cannot create socket for %s",
+			    nconf->nc_netid);
+			return (1);
+		}
+
 		if ((strcmp(nconf->nc_netid, "local") != 0) &&
 		    (strcmp(nconf->nc_netid, "unix") != 0)) {
 			if ((aicode = getaddrinfo(NULL, servname, &hints, &res))!= 0) {
