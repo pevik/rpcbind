@@ -78,6 +78,7 @@
 static inline void __nss_configure_lookup(const char *db, const char *s) {}
 #endif
 #include "rpcbind.h"
+#include "xlog.h"
 
 /*#define RPCBIND_DEBUG*/
 
@@ -191,9 +192,16 @@ main(int argc, char *argv[])
 		exit(1);
 	}
 	xlog_open("rpcbind");
-	xlog_syslog(TRUE);
-	xlog_syslog(TRUE);
-	
+	if (dofork) {
+		xlog_syslog(TRUE);
+		xlog_stderr(FALSE);
+	} else {
+		xlog_syslog(FALSE);
+		xlog_stderr(TRUE);
+	}
+	if (debugging)
+		xlog_config(D_ALL, 1);
+
 	rpc_control(RPC_SVC_CONNMAXREC_SET, &maxrec);
 
 	init_transport(nconf);
