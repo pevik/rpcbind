@@ -38,7 +38,8 @@ rpcbind_SOURCES = \
 	src/rpcbind.h \
 	src/security.c \
 	src/util.c \
-	src/warmstart.c
+	src/warmstart.c \
+	src/xlog.c
 rpcbind_LDADD = $(TIRPC_LIBS)
 
 if SYSTEMD
