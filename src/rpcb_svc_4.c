@@ -89,7 +89,7 @@ rpcb_service_4(struct svc_req *rqstp, SVCXPRT *transp)
 		 */
 #ifdef RPCBIND_DEBUG
 		if (debugging)
-			fprintf(stderr, "RPCBPROC_NULL\n");
+			xlog(LOG_DEBUG, "RPCBPROC_NULL\n");
 #endif
 		check_access(transp, rqstp->rq_proc, 0, RPCBVERS4);
 		(void) svc_sendreply(transp, (xdrproc_t) xdr_void,
@@ -125,7 +125,7 @@ rpcb_service_4(struct svc_req *rqstp, SVCXPRT *transp)
 	case RPCBPROC_GETVERSADDR:
 #ifdef RPCBIND_DEBUG
 		if (debugging)
-			fprintf(stderr, "RPCBPROC_GETVERSADDR\n");
+			xlog(LOG_DEBUG, "RPCBPROC_GETVERSADDR\n");
 #endif
 		xdr_argument = (xdrproc_t)xdr_rpcb;
 		xdr_result = (xdrproc_t)xdr_wrapstring;
@@ -135,7 +135,7 @@ rpcb_service_4(struct svc_req *rqstp, SVCXPRT *transp)
 	case RPCBPROC_DUMP:
 #ifdef RPCBIND_DEBUG
 		if (debugging)
-			fprintf(stderr, "RPCBPROC_DUMP\n");
+			xlog(LOG_DEBUG, "RPCBPROC_DUMP\n");
 #endif
 		xdr_argument = (xdrproc_t)xdr_void;
 		xdr_result = (xdrproc_t)xdr_rpcblist_ptr;
@@ -145,7 +145,7 @@ rpcb_service_4(struct svc_req *rqstp, SVCXPRT *transp)
 	case RPCBPROC_INDIRECT:
 #ifdef RPCBIND_DEBUG
 		if (debugging)
-			fprintf(stderr, "RPCBPROC_INDIRECT\n");
+			xlog(LOG_DEBUG, "RPCBPROC_INDIRECT\n");
 #endif
 		rpcbproc_callit_com(rqstp, transp, rqstp->rq_proc, RPCBVERS4);
 		return;
@@ -154,7 +154,7 @@ rpcb_service_4(struct svc_req *rqstp, SVCXPRT *transp)
 	case RPCBPROC_BCAST:
 #ifdef RPCBIND_DEBUG
 		if (debugging)
-			fprintf(stderr, "RPCBPROC_BCAST\n");
+			xlog(LOG_DEBUG, "RPCBPROC_BCAST\n");
 #endif
 		rpcbproc_callit_com(rqstp, transp, rqstp->rq_proc, RPCBVERS4);
 		return;
@@ -162,7 +162,7 @@ rpcb_service_4(struct svc_req *rqstp, SVCXPRT *transp)
 	case RPCBPROC_GETTIME:
 #ifdef RPCBIND_DEBUG
 		if (debugging)
-			fprintf(stderr, "RPCBPROC_GETTIME\n");
+			xlog(LOG_DEBUG, "RPCBPROC_GETTIME\n");
 #endif
 		xdr_argument = (xdrproc_t)xdr_void;
 		xdr_result = (xdrproc_t)xdr_u_long;
@@ -172,7 +172,7 @@ rpcb_service_4(struct svc_req *rqstp, SVCXPRT *transp)
 	case RPCBPROC_UADDR2TADDR:
 #ifdef RPCBIND_DEBUG
 		if (debugging)
-			fprintf(stderr, "RPCBPROC_UADDR2TADDR\n");
+			xlog(LOG_DEBUG, "RPCBPROC_UADDR2TADDR\n");
 #endif
 		xdr_argument = (xdrproc_t)xdr_wrapstring;
 		xdr_result = (xdrproc_t)xdr_netbuf;
@@ -182,7 +182,7 @@ rpcb_service_4(struct svc_req *rqstp, SVCXPRT *transp)
 	case RPCBPROC_TADDR2UADDR:
 #ifdef RPCBIND_DEBUG
 		if (debugging)
-			fprintf(stderr, "RPCBPROC_TADDR2UADDR\n");
+			xlog(LOG_DEBUG, "RPCBPROC_TADDR2UADDR\n");
 #endif
 		xdr_argument = (xdrproc_t)xdr_netbuf;
 		xdr_result = (xdrproc_t)xdr_wrapstring;
@@ -192,7 +192,7 @@ rpcb_service_4(struct svc_req *rqstp, SVCXPRT *transp)
 	case RPCBPROC_GETADDRLIST:
 #ifdef RPCBIND_DEBUG
 		if (debugging)
-			fprintf(stderr, "RPCBPROC_GETADDRLIST\n");
+			xlog(LOG_DEBUG, "RPCBPROC_GETADDRLIST\n");
 #endif
 		xdr_argument = (xdrproc_t)xdr_rpcb;
 		xdr_result = (xdrproc_t)xdr_rpcb_entry_list_ptr;
@@ -202,7 +202,7 @@ rpcb_service_4(struct svc_req *rqstp, SVCXPRT *transp)
 	case RPCBPROC_GETSTAT:
 #ifdef RPCBIND_DEBUG
 		if (debugging)
-			fprintf(stderr, "RPCBPROC_GETSTAT\n");
+			xlog(LOG_DEBUG, "RPCBPROC_GETSTAT\n");
 #endif
 		xdr_argument = (xdrproc_t)xdr_void;
 		xdr_result = (xdrproc_t)xdr_rpcb_stat_byvers;
@@ -218,7 +218,7 @@ rpcb_service_4(struct svc_req *rqstp, SVCXPRT *transp)
 		(char *)&argument)) {
 		svcerr_decode(transp);
 		if (debugging)
-			(void) fprintf(stderr, "rpcbind: could not decode\n");
+			(void) xlog(LOG_DEBUG, "rpcbind: could not decode\n");
 		return;
 	}
 
@@ -236,7 +236,7 @@ rpcb_service_4(struct svc_req *rqstp, SVCXPRT *transp)
 						result)) {
 		svcerr_systemerr(transp);
 		if (debugging) {
-			(void) fprintf(stderr, "rpcbind: svc_sendreply\n");
+			(void) xlog(LOG_DEBUG, "rpcbind: svc_sendreply\n");
 			if (doabort) {
 				rpcbind_abort();
 			}
@@ -246,7 +246,7 @@ done:
 	if (!svc_freeargs(transp, (xdrproc_t) xdr_argument,
 				(char *)&argument)) {
 		if (debugging) {
-			(void) fprintf(stderr, "unable to free arguments\n");
+			(void) xlog(LOG_DEBUG, "unable to free arguments\n");
 			if (doabort) {
 				rpcbind_abort();
 			}
@@ -277,7 +277,7 @@ rpcbproc_getaddr_4_local(void *arg, struct svc_req *rqstp, SVCXPRT *transp,
 
 		uaddr =	taddr2uaddr(rpcbind_get_conf(transp->xp_netid),
 			    svc_getrpccaller(transp));
-		fprintf(stderr, "RPCB_GETADDR req for (%lu, %lu, %s) from %s: ",
+		xlog(LOG_DEBUG, "RPCB_GETADDR req for (%lu, %lu, %s) from %s: ",
 		    (unsigned long)regp->r_prog, (unsigned long)regp->r_vers,
 		    regp->r_netid, uaddr);
 		free(uaddr);
@@ -307,7 +307,7 @@ rpcbproc_getversaddr_4_local(void *arg, struct svc_req *rqstp, SVCXPRT *transp,
 
 		uaddr = taddr2uaddr(rpcbind_get_conf(transp->xp_netid),
 			    svc_getrpccaller(transp));
-		fprintf(stderr, "RPCB_GETVERSADDR rqst for (%lu, %lu, %s)"
+		xlog(LOG_DEBUG, "RPCB_GETVERSADDR rqst for (%lu, %lu, %s)"
 				" from %s : ",
 		    (unsigned long)regp->r_prog, (unsigned long)regp->r_vers,
 		    regp->r_netid, uaddr);
@@ -353,7 +353,7 @@ rpcbproc_getaddrlist_4_local(void *arg, struct svc_req *rqstp /*__unused*/,
 	}
 #ifdef RPCBIND_DEBUG
 	if (debugging) {
-		fprintf(stderr, "r_addr: %s r_netid: %s nc_protofmly: %s\n",
+		xlog(LOG_DEBUG, "r_addr: %s r_netid: %s nc_protofmly: %s\n",
 		    regp->r_addr, regp->r_netid, reg_nconf->nc_protofmly);
 	}
 #endif
@@ -369,20 +369,20 @@ rpcbproc_getaddrlist_4_local(void *arg, struct svc_req *rqstp /*__unused*/,
 		}
 #ifdef RPCBIND_DEBUG
 		if (debugging)
-			fprintf(stderr, "\tmerge with: %s\n",
+			xlog(LOG_DEBUG, "\tmerge with: %s\n",
 			    rbl->rpcb_map.r_addr);
 #endif
 		if ((maddr = mergeaddr(transp, rbl->rpcb_map.r_netid,
 				rbl->rpcb_map.r_addr, saddr)) == NULL) {
 #ifdef RPCBIND_DEBUG
 		if (debugging)
-			fprintf(stderr, " FAILED\n");
+			xlog(LOG_DEBUG, " FAILED\n");
 #endif
 			continue;
 		} else if (!maddr[0]) {
 #ifdef RPCBIND_DEBUG
 	if (debugging)
-		fprintf(stderr, " SUCCEEDED, but port died -  maddr: nullstring\n");
+		xlog(LOG_DEBUG, " SUCCEEDED, but port died -  maddr: nullstring\n");
 #endif
 			/* The server died. Unset this combination */
 			delete_prog(regp->r_prog);
@@ -390,7 +390,7 @@ rpcbproc_getaddrlist_4_local(void *arg, struct svc_req *rqstp /*__unused*/,
 		}
 #ifdef RPCBIND_DEBUG
 		if (debugging)
-			fprintf(stderr, " SUCCEEDED maddr: %s\n", maddr);
+			xlog(LOG_DEBUG, " SUCCEEDED maddr: %s\n", maddr);
 #endif
 		/*
 		 * Add it to rlist.
@@ -418,7 +418,7 @@ rpcbproc_getaddrlist_4_local(void *arg, struct svc_req *rqstp /*__unused*/,
 #ifdef RPCBIND_DEBUG
 	if (debugging) {
 		for (rp = rlist; rp; rp = rp->rpcb_entry_next) {
-			fprintf(stderr, "\t%s %s\n", rp->rpcb_entry_map.r_maddr,
+			xlog(LOG_DEBUG, "\t%s %s\n", rp->rpcb_entry_map.r_maddr,
 				rp->rpcb_entry_map.r_nc_proto);
 		}
 	}

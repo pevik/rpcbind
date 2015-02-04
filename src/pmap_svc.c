@@ -54,9 +54,11 @@ static	char sccsid[] = "@(#)pmap_svc.c 1.23 89/04/05 Copyr 1984 Sun Micro";
 #include <rpc/pmap_prot.h>
 #include <rpc/rpcb_prot.h>
 #ifdef RPCBIND_DEBUG
+#include <syslog.h>
 #include <stdlib.h>
 #endif
 #include "rpcbind.h"
+#include "xlog.h"
 #include <rpc/svc_soc.h> /* svc_getcaller routine definition */
 static struct pmaplist *find_service_pmap __P((rpcprog_t, rpcvers_t,
 					       rpcprot_t));
@@ -78,7 +80,7 @@ pmap_service(struct svc_req *rqstp, SVCXPRT *xprt)
 		 */
 #ifdef RPCBIND_DEBUG
 		if (debugging)
-			fprintf(stderr, "PMAPPROC_NULL\n");
+			xlog(LOG_DEBUG, "PMAPPROC_NULL\n");
 #endif
 		check_access(xprt, rqstp->rq_proc, 0, PMAPVERS);
 		if ((!svc_sendreply(xprt, (xdrproc_t) xdr_void, NULL)) &&
@@ -117,7 +119,7 @@ pmap_service(struct svc_req *rqstp, SVCXPRT *xprt)
 		 */
 #ifdef RPCBIND_DEBUG
 		if (debugging)
-			fprintf(stderr, "PMAPPROC_DUMP\n");
+			xlog(LOG_DEBUG, "PMAPPROC_DUMP\n");
 #endif
 		pmapproc_dump(rqstp, xprt);
 		break;
@@ -196,7 +198,7 @@ pmapproc_change(struct svc_req *rqstp /*__unused*/, SVCXPRT *xprt, unsigned long
 	}
 #ifdef RPCBIND_DEBUG
 	if (debugging)
-	  fprintf(stderr, "%s request for (%lu, %lu) : ",
+	  xlog(LOG_DEBUG, "%s request for (%lu, %lu) : ",
 		  op == PMAPPROC_SET ? "PMAP_SET" : "PMAP_UNSET",
 		  reg.pm_prog, reg.pm_vers);
 #endif
@@ -243,14 +245,14 @@ pmapproc_change(struct svc_req *rqstp /*__unused*/, SVCXPRT *xprt, unsigned long
 done_change:
 	if ((!svc_sendreply(xprt, (xdrproc_t) xdr_long, (caddr_t) &ans)) &&
 	    debugging) {
-		fprintf(stderr, "portmap: svc_sendreply\n");
+		xlog(L_ERROR, "portmap: svc_sendreply failed!\n");
 		if (doabort) {
 			rpcbind_abort();
 		}
 	}
 #ifdef RPCBIND_DEBUG
 	if (debugging)
-		fprintf(stderr, "%s\n", ans == TRUE ? "succeeded" : "failed");
+		xlog(LOG_DEBUG, "%s\n", ans == TRUE ? "succeeded" : "failed");
 #endif
 	if (op == PMAPPROC_SET)
 		rpcbs_set(RPCBVERS_2_STAT, ans);
@@ -285,7 +287,7 @@ pmapproc_getport(struct svc_req *rqstp /*__unused*/, SVCXPRT *xprt)
 	if (debugging) {
 		uaddr =  taddr2uaddr(rpcbind_get_conf(xprt->xp_netid),
 			    svc_getrpccaller(xprt));
-		fprintf(stderr, "PMAP_GETPORT req for (%lu, %lu, %s) from %s :",
+		xlog(LOG_DEBUG, "PMAP_GETPORT req for (%lu, %lu, %s) from %s :",
 			reg.pm_prog, reg.pm_vers,
 			pmap_ipprot2netid(reg.pm_prot)?: "<invalid>",
 			uaddr);
@@ -315,14 +317,14 @@ pmapproc_getport(struct svc_req *rqstp /*__unused*/, SVCXPRT *xprt)
 	lport = port;
 	if ((!svc_sendreply(xprt, (xdrproc_t) xdr_long, (caddr_t)&lport)) &&
 			debugging) {
-		(void) fprintf(stderr, "portmap: svc_sendreply\n");
+		xlog(L_ERROR, "portmap: svc_sendreply failed!\n");
 		if (doabort) {
 			rpcbind_abort();
 		}
 	}
 #ifdef RPCBIND_DEBUG
 	if (debugging)
-		fprintf(stderr, "port = %d\n", port);
+		xlog(LOG_DEBUG, "port = %d\n", port);
 #endif
 	rpcbs_getaddr(RPCBVERS_2_STAT, reg.pm_prog, reg.pm_vers,
 		pmap_ipprot2netid(reg.pm_prot) ?: "<unknown>",
@@ -347,8 +349,7 @@ pmapproc_dump(struct svc_req *rqstp /*__unused*/, SVCXPRT *xprt)
 	
 	if ((!svc_sendreply(xprt, (xdrproc_t) xdr_pmaplist_ptr,
 			(caddr_t)&list_pml)) && debugging) {
-		if (debugging)
-			(void) fprintf(stderr, "portmap: svc_sendreply\n");
+		xlog(L_ERROR, "portmap: svc_sendreply failed!\n");
 		if (doabort) {
 			rpcbind_abort();
 		}

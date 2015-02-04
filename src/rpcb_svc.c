@@ -86,7 +86,7 @@ rpcb_service_3(struct svc_req *rqstp, SVCXPRT *transp)
 		 */
 #ifdef RPCBIND_DEBUG
 		if (debugging)
-			fprintf(stderr, "RPCBPROC_NULL\n");
+			xlog(LOG_DEBUG, "RPCBPROC_NULL");
 #endif
 		/* This call just logs, no actual checks */
 		check_access(transp, rqstp->rq_proc, 0, RPCBVERS);
@@ -114,7 +114,7 @@ rpcb_service_3(struct svc_req *rqstp, SVCXPRT *transp)
 	case RPCBPROC_DUMP:
 #ifdef RPCBIND_DEBUG
 		if (debugging)
-			fprintf(stderr, "RPCBPROC_DUMP\n");
+			xlog(LOG_DEBUG, "RPCBPROC_DUMP");
 #endif
 		xdr_argument = (xdrproc_t)xdr_void;
 		xdr_result = (xdrproc_t)xdr_rpcblist_ptr;
@@ -128,7 +128,7 @@ rpcb_service_3(struct svc_req *rqstp, SVCXPRT *transp)
 	case RPCBPROC_GETTIME:
 #ifdef RPCBIND_DEBUG
 		if (debugging)
-			fprintf(stderr, "RPCBPROC_GETTIME\n");
+			xlog(LOG_DEBUG, "RPCBPROC_GETTIME");
 #endif
 		xdr_argument = (xdrproc_t)xdr_void;
 		xdr_result = (xdrproc_t)xdr_u_long;
@@ -138,7 +138,7 @@ rpcb_service_3(struct svc_req *rqstp, SVCXPRT *transp)
 	case RPCBPROC_UADDR2TADDR:
 #ifdef RPCBIND_DEBUG
 		if (debugging)
-			fprintf(stderr, "RPCBPROC_UADDR2TADDR\n");
+			xlog(LOG_DEBUG, "RPCBPROC_UADDR2TADDR");
 #endif
 		xdr_argument = (xdrproc_t)xdr_wrapstring;
 		xdr_result = (xdrproc_t)xdr_netbuf;
@@ -148,7 +148,7 @@ rpcb_service_3(struct svc_req *rqstp, SVCXPRT *transp)
 	case RPCBPROC_TADDR2UADDR:
 #ifdef RPCBIND_DEBUG
 		if (debugging)
-			fprintf(stderr, "RPCBPROC_TADDR2UADDR\n");
+			xlog(LOG_DEBUG, "RPCBPROC_TADDR2UADDR");
 #endif
 		xdr_argument = (xdrproc_t)xdr_netbuf;
 		xdr_result = (xdrproc_t)xdr_wrapstring;
@@ -164,7 +164,7 @@ rpcb_service_3(struct svc_req *rqstp, SVCXPRT *transp)
 				(char *) &argument)) {
 		svcerr_decode(transp);
 		if (debugging)
-			(void) fprintf(stderr, "rpcbind: could not decode\n");
+			(void) xlog(LOG_DEBUG, "rpcbind: could not decode");
 		return;
 	}
 
@@ -182,7 +182,7 @@ rpcb_service_3(struct svc_req *rqstp, SVCXPRT *transp)
 						result)) {
 		svcerr_systemerr(transp);
 		if (debugging) {
-			(void) fprintf(stderr, "rpcbind: svc_sendreply\n");
+			(void) xlog(LOG_DEBUG, "rpcbind: svc_sendreply");
 			if (doabort) {
 				rpcbind_abort();
 			}
@@ -192,7 +192,7 @@ done:
 	if (!svc_freeargs(transp, (xdrproc_t)xdr_argument, (char *)
 				&argument)) {
 		if (debugging) {
-			(void) fprintf(stderr, "unable to free arguments\n");
+			(void) xlog(LOG_DEBUG, "unable to free arguments");
 			if (doabort) {
 				rpcbind_abort();
 			}
@@ -220,7 +220,7 @@ rpcbproc_getaddr_3_local(void *arg, struct svc_req *rqstp /*__unused*/,
 
 		uaddr = taddr2uaddr(rpcbind_get_conf(transp->xp_netid),
 			    svc_getrpccaller(transp));
-		fprintf(stderr, "RPCB_GETADDR req for (%lu, %lu, %s) from %s: ",
+		xlog(LOG_DEBUG, "RPCB_GETADDR req for (%lu, %lu, %s) from %s: ",
 		    (unsigned long)regp->r_prog, (unsigned long)regp->r_vers,
 		    regp->r_netid, uaddr);
 		free(uaddr);

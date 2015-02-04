@@ -80,7 +80,7 @@ check_access(SVCXPRT *xprt, rpcproc_t proc, rpcprog_t prog, unsigned int rpcbver
 		if (!insecure && !is_loopback(caller)) {
 #ifdef RPCBIND_DEBUG
 			  if (debugging)
-			    fprintf(stderr, " declined (non-loopback sender) \n");
+			    xlog(LOG_DEBUG, " declined (non-loopback sender) \n");
 #endif
 			if (verboselog)
 				logit(log_severity, addr, proc, prog,
@@ -134,7 +134,7 @@ is_loopback(struct netbuf *nbuf)
 		sin = (struct sockaddr_in *)addr;
 #ifdef RPCBIND_DEBUG
 		if (debugging)
-			  fprintf(stderr,
+			  xlog(LOG_DEBUG,
 				  "Checking caller's adress (port = %d)\n",
 				  ntohs(sin->sin_port));
 #endif
@@ -146,7 +146,7 @@ is_loopback(struct netbuf *nbuf)
 		sin6 = (struct sockaddr_in6 *)addr;
 #ifdef RPCBIND_DEBUG
 		if (debugging)
-			  fprintf(stderr,
+			  xlog(LOG_DEBUG,
 				  "Checking caller's adress (port = %d)\n",
 				  ntohs(sin6->sin6_port));
 #endif

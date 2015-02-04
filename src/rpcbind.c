@@ -165,7 +165,7 @@ main(int argc, char *argv[])
 			rl.rlim_cur = 128;
 		setrlimit(RLIMIT_NOFILE, &rl);
 	}
-	openlog("rpcbind", LOG_CONS, LOG_DAEMON);
+
 	if (geteuid()) { /* This command allowed only to root */
 		fprintf(stderr, "Sorry. You are not superuser\n");
 		exit(1);
@@ -190,6 +190,9 @@ main(int argc, char *argv[])
 		syslog(LOG_ERR, "%s: can't find local transport\n", argv[0]);
 		exit(1);
 	}
+	xlog_open("rpcbind");
+	xlog_syslog(TRUE);
+	xlog_syslog(TRUE);
 	
 	rpc_control(RPC_SVC_CONNMAXREC_SET, &maxrec);
 
@@ -344,11 +347,11 @@ init_transport(struct netconfig *nconf)
 		int i;
 		char **s;
 
-		(void) fprintf(stderr, "%s: %ld lookup routines :\n",
+		(void) xlog(LOG_DEBUG, "%s: %ld lookup routines :\n",
 			nconf->nc_netid, nconf->nc_nlookups);
 		for (i = 0, s = nconf->nc_lookups; i < nconf->nc_nlookups;
 		     i++, s++)
-			fprintf(stderr, "[%d] - %s\n", i, *s);
+			xlog(LOG_DEBUG, "[%d] - %s\n", i, *s);
 	}
 #endif
 	if (!__rpc_nconf2sockinfo(nconf, &si)) {
@@ -571,7 +574,7 @@ init_transport(struct netconfig *nconf)
 				}
 				nb.len = nb.maxlen = sa_size;
 				uaddr = taddr2uaddr(nconf, &nb);
-				(void) fprintf(stderr,
+				(void) xlog(LOG_DEBUG,
 				    "rpcbind : my address is %s\n", uaddr);
 				(void) free(uaddr);
 			}
@@ -654,7 +657,7 @@ init_transport(struct netconfig *nconf)
 			}
 			nb.len = nb.maxlen = sa_size2;
 			uaddr = taddr2uaddr(nconf, &nb);
-			(void) fprintf(stderr, "rpcbind : my address is %s\n",
+			(void) xlog(LOG_DEBUG, "rpcbind : my address is %s\n",
 			    uaddr);
 			(void) free(uaddr);
 		}
@@ -761,13 +764,13 @@ got_socket:
 #ifdef RPCBIND_DEBUG
 	if (debugging) {
 		if (status < 0) {
-			fprintf(stderr, "Error in finding bind status for %s\n",
+			xlog(LOG_DEBUG, "Error in finding bind status for %s\n",
 				nconf->nc_netid);
 		} else if (status == 0) {
-			fprintf(stderr, "check binding for %s\n",
+			xlog(LOG_DEBUG, "check binding for %s\n",
 				nconf->nc_netid);
 		} else if (status > 0) {
-			fprintf(stderr, "No check binding for %s\n",
+			xlog(LOG_DEBUG, "No check binding for %s\n",
 				nconf->nc_netid);
 		}
 	}
@@ -781,11 +784,11 @@ got_socket:
 #ifdef RPCBIND_DEBUG
 		if (debugging) {
 			if (status < 0) {
-				fprintf(stderr,
+				xlog(LOG_DEBUG,
 				    "Could not create rmtcall fd for %s\n",
 					nconf->nc_netid);
 			} else {
-				fprintf(stderr, "rmtcall fd for %s is %d\n",
+				xlog(LOG_DEBUG, "rmtcall fd for %s is %d\n",
 					nconf->nc_netid, status);
 			}
 		}
@@ -810,8 +813,8 @@ rbllist_add(rpcprog_t prog, rpcvers_t vers, struct netconfig *nconf,
 	}
 #ifdef RPCBIND_DEBUG	
 	if (debugging){
-	  fprintf(stderr,"FUNCTION rbllist_add");
-	  fprintf(stderr,"Add the prog %lu vers %lu to the rpcbind list\n",
+	  xlog(LOG_DEBUG,"FUNCTION rbllist_add");
+	  xlog(LOG_DEBUG,"Add the prog %lu vers %lu to the rpcbind list",
                   (ulong)prog, (ulong)vers);
 	}
 #endif	

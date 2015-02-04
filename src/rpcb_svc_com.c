@@ -137,14 +137,14 @@ rpcbproc_set_com(void *arg, struct svc_req *rqstp /*__unused*/, SVCXPRT *transp,
 
 #ifdef RPCBIND_DEBUG
 	if (debugging)
-		fprintf(stderr, "RPCB_SET request for (%lu, %lu, %s, %s) : ",
+		xlog(LOG_DEBUG, "RPCB_SET request for (%lu, %lu, %s, %s) : ",
 		    (unsigned long)regp->r_prog, (unsigned long)regp->r_vers,
 		    regp->r_netid, regp->r_addr);
 #endif
 	ans = map_set(regp, getowner(transp, owner, sizeof owner));
 #ifdef RPCBIND_DEBUG
 	if (debugging)
-		fprintf(stderr, "%s\n", ans == TRUE ? "succeeded" : "failed");
+		xlog(LOG_DEBUG, "RPCB_SET: %s", ans == TRUE ? "succeeded" : "failed");
 #endif
 	/* XXX: should have used some defined constant here */
 	rpcbs_set(rpcbversnum - 2, ans);
@@ -225,7 +225,7 @@ rpcbproc_unset_com(void *arg, struct svc_req *rqstp /*__unused*/, SVCXPRT *trans
 
 #ifdef RPCBIND_DEBUG
 	if (debugging)
-		fprintf(stderr, "RPCB_UNSET request for (%lu, %lu, %s) : ",
+		xlog(LOG_DEBUG, "RPCB_UNSET request for (%lu, %lu, %s) : ",
 		    (unsigned long)regp->r_prog, (unsigned long)regp->r_vers,
 		    regp->r_netid);
 #endif
@@ -233,7 +233,7 @@ rpcbproc_unset_com(void *arg, struct svc_req *rqstp /*__unused*/, SVCXPRT *trans
 	ans = map_unset(regp, getowner(transp, owner, sizeof owner));
 #ifdef RPCBIND_DEBUG
 	if (debugging)
-		fprintf(stderr, "%s\n", ans == TRUE ? "succeeded" : "failed");
+		xlog(LOG_DEBUG, "RPCB_UNSET: %s", ans == TRUE ? "succeeded" : "failed");
 #endif
 	/* XXX: should have used some defined constant here */
 	rpcbs_unset(rpcbversnum - 2, ans);
@@ -264,9 +264,9 @@ map_unset(RPCB *regp, char *owner)
 		 * if superuser or the owner itself.
 		 */
 #ifdef RPCBIND_DEBUG
-		fprintf(stderr,"Suppression RPC_UNSET(map_unset)\n ");
-		fprintf(stderr,"rbl->rpcb_map.r_owner=%s\n ",rbl->rpcb_map.r_owner);
-		fprintf(stderr,"owner=%s\n ",owner);
+		xlog(LOG_DEBUG,"Suppression RPC_UNSET(map_unset) ");
+		xlog(LOG_DEBUG,"rbl->rpcb_map.r_owner=%s ",rbl->rpcb_map.r_owner);
+		xlog(LOG_DEBUG,"owner=%s ",owner);
 #endif
 		if (strcmp(owner, "superuser") &&
 			strcmp(rbl->rpcb_map.r_owner, owner))
@@ -349,7 +349,7 @@ rpcbproc_getaddr_com(RPCB *regp, struct svc_req *rqstp /*__unused*/,
 	}
 #ifdef RPCBIND_DEBUG
 	if (debugging)
-		fprintf(stderr, "getaddr: %s\n", uaddr);
+		xlog(LOG_DEBUG, "getaddr: %s", uaddr);
 #endif
 	/* XXX: should have used some defined constant here */
 	rpcbs_getaddr(rpcbversnum - 2, regp->r_prog, regp->r_vers,
@@ -506,7 +506,7 @@ create_rmtcall_fd(struct netconfig *nconf)
 
 	if ((fd = __rpc_nconf2fd(nconf)) == -1) {
 		if (debugging)
-			fprintf(stderr,
+			xlog(LOG_DEBUG,
 	"create_rmtcall_fd: couldn't open \"%s\" (errno %d)\n",
 			nconf->nc_device, errno);
 		return (-1);
@@ -514,7 +514,7 @@ create_rmtcall_fd(struct netconfig *nconf)
 	xprt = svc_tli_create(fd, 0, (struct t_bind *) 0, 0, 0);
 	if (xprt == NULL) {
 		if (debugging)
-			fprintf(stderr,
+			xlog(LOG_DEBUG,
 				"create_rmtcall_fd: svc_tli_create failed\n");
 		return (-1);
 	}
@@ -656,7 +656,7 @@ rpcbproc_callit_com(struct svc_req *rqstp, SVCXPRT *transp,
 #endif	/* notyet */
 		if (buf_alloc == NULL) {
 			if (debugging)
-				fprintf(stderr,
+				xlog(LOG_DEBUG,
 					"rpcbproc_callit_com:  No Memory!\n");
 			if (reply_type == RPCBPROC_INDIRECT)
 				svcerr_systemerr(transp);
@@ -672,7 +672,7 @@ rpcbproc_callit_com(struct svc_req *rqstp, SVCXPRT *transp,
 		if (reply_type == RPCBPROC_INDIRECT)
 			svcerr_decode(transp);
 		if (debugging)
-			fprintf(stderr,
+			xlog(LOG_DEBUG,
 			"rpcbproc_callit_com:  svc_getargs failed\n");
 		goto error;
 	}
@@ -686,7 +686,7 @@ rpcbproc_callit_com(struct svc_req *rqstp, SVCXPRT *transp,
 #ifdef RPCBIND_DEBUG
 	if (debugging) {
 		uaddr = taddr2uaddr(rpcbind_get_conf(transp->xp_netid), caller);
-		fprintf(stderr, "%s %s req for (%lu, %lu, %lu, %s) from %s : ",
+		xlog(LOG_DEBUG, "%s %s req for (%lu, %lu, %lu, %s) from %s : ",
 			versnum == PMAPVERS ? "pmap_rmtcall" :
 			versnum == RPCBVERS ? "rpcb_rmtcall" :
 			versnum == RPCBVERS4 ? "rpcb_indirect" : "unknown",
@@ -707,7 +707,7 @@ rpcbproc_callit_com(struct svc_req *rqstp, SVCXPRT *transp,
 	if (rbl == (rpcblist_ptr)NULL) {
 #ifdef RPCBIND_DEBUG
 		if (debugging)
-			fprintf(stderr, "not found\n");
+			xlog(LOG_DEBUG, "not found\n");
 #endif
 		if (reply_type == RPCBPROC_INDIRECT)
 			svcerr_noprog(transp);
@@ -726,7 +726,7 @@ rpcbproc_callit_com(struct svc_req *rqstp, SVCXPRT *transp,
 
 #ifdef RPCBIND_DEBUG
 	if (debugging)
-		fprintf(stderr, "found at uaddr %s\n", rbl->rpcb_map.r_addr);
+		xlog(LOG_DEBUG, "found at uaddr %s\n", rbl->rpcb_map.r_addr);
 #endif
 	/*
 	 *	Check whether this entry is valid and a server is present
@@ -750,14 +750,14 @@ rpcbproc_callit_com(struct svc_req *rqstp, SVCXPRT *transp,
 		if (reply_type == RPCBPROC_INDIRECT)
 			svcerr_systemerr(transp);
 		if (debugging)
-			fprintf(stderr,
+			xlog(LOG_DEBUG,
 			"rpcbproc_callit_com:  rpcbind_get_conf failed\n");
 		goto error;
 	}
 	localsa = local_sa(((struct sockaddr *)caller->buf)->sa_family);
 	if (localsa == NULL) {
 		if (debugging)
-			fprintf(stderr,
+			xlog(LOG_DEBUG,
 			"rpcbproc_callit_com: no local address\n");
 		goto error;
 	}
@@ -780,7 +780,7 @@ rpcbproc_callit_com(struct svc_req *rqstp, SVCXPRT *transp,
 			nconf->nc_netid);
 #ifdef RPCBIND_DEBUG
 	if (debugging)
-		fprintf(stderr, "merged uaddr %s\n", m_uaddr);
+		xlog(LOG_DEBUG, "merged uaddr %s\n", m_uaddr);
 #endif
 	if ((fd = find_rmtcallfd_by_netid(nconf->nc_netid)) == -1) {
 		if (reply_type == RPCBPROC_INDIRECT)
@@ -800,20 +800,20 @@ rpcbproc_callit_com(struct svc_req *rqstp, SVCXPRT *transp,
 		 * beat on it any more.
 		 */
 		if (debugging)
-			fprintf(stderr,
+			xlog(LOG_DEBUG,
 			"rpcbproc_callit_com:  duplicate request\n");
 		goto error;
 	case -1:
 		/*  forward_register failed.  Perhaps no memory. */
 		if (debugging)
-			fprintf(stderr,
+			xlog(LOG_DEBUG,
 			"rpcbproc_callit_com:  forward_register failed\n");
 		goto error;
 	}
 
 #ifdef DEBUG_RMTCALL
 	if (debugging)
-		fprintf(stderr,
+		xlog(LOG_DEBUG,
 			"rpcbproc_callit_com:  original XID %x, new XID %x\n",
 				*xidp, call_msg.rm_xid);
 #endif
@@ -831,7 +831,7 @@ rpcbproc_callit_com(struct svc_req *rqstp, SVCXPRT *transp,
 			if (reply_type == RPCBPROC_INDIRECT)
 				svcerr_systemerr(transp);
 			if (debugging)
-				fprintf(stderr,
+				xlog(LOG_DEBUG,
 				"rpcbproc_callit_com:  No memory!\n");
 			goto error;
 		}
@@ -843,7 +843,7 @@ rpcbproc_callit_com(struct svc_req *rqstp, SVCXPRT *transp,
 		if (reply_type == RPCBPROC_INDIRECT)
 			svcerr_systemerr(transp);
 		if (debugging)
-			fprintf(stderr,
+			xlog(LOG_DEBUG,
 			"rpcbproc_callit_com:  xdr_callhdr failed\n");
 		goto error;
 	}
@@ -851,7 +851,7 @@ rpcbproc_callit_com(struct svc_req *rqstp, SVCXPRT *transp,
 		if (reply_type == RPCBPROC_INDIRECT)
 			svcerr_systemerr(transp);
 		if (debugging)
-			fprintf(stderr,
+			xlog(LOG_DEBUG,
 			"rpcbproc_callit_com:  xdr_u_long failed\n");
 		goto error;
 	}
@@ -870,7 +870,7 @@ rpcbproc_callit_com(struct svc_req *rqstp, SVCXPRT *transp,
 	} else {
 		/* we do not support any other authentication scheme */
 		if (debugging)
-			fprintf(stderr,
+			xlog(LOG_DEBUG,
 "rpcbproc_callit_com:  oa_flavor != AUTH_NONE and oa_flavor != AUTH_SYS\n");
 		if (reply_type == RPCBPROC_INDIRECT)
 			svcerr_weakauth(transp); /* XXX too strong.. */
@@ -880,7 +880,7 @@ rpcbproc_callit_com(struct svc_req *rqstp, SVCXPRT *transp,
 		if (reply_type == RPCBPROC_INDIRECT)
 			svcerr_systemerr(transp);
 		if (debugging)
-			fprintf(stderr,
+			xlog(LOG_DEBUG,
 		"rpcbproc_callit_com:  authwhatever_create returned NULL\n");
 		goto error;
 	}
@@ -889,7 +889,7 @@ rpcbproc_callit_com(struct svc_req *rqstp, SVCXPRT *transp,
 			svcerr_systemerr(transp);
 		AUTH_DESTROY(auth);
 		if (debugging)
-			fprintf(stderr,
+			xlog(LOG_DEBUG,
 		"rpcbproc_callit_com:  AUTH_MARSHALL failed\n");
 		goto error;
 	}
@@ -898,7 +898,7 @@ rpcbproc_callit_com(struct svc_req *rqstp, SVCXPRT *transp,
 		if (reply_type == RPCBPROC_INDIRECT)
 			svcerr_systemerr(transp);
 		if (debugging)
-			fprintf(stderr,
+			xlog(LOG_DEBUG,
 		"rpcbproc_callit_com:  xdr_opaque_parms failed\n");
 		goto error;
 	}
@@ -918,7 +918,7 @@ rpcbproc_callit_com(struct svc_req *rqstp, SVCXPRT *transp,
 	if (sendto(fd, outbufp, outlen, 0, (struct sockaddr *)na->buf, na->len)
 	    != outlen) {
 		if (debugging)
-			fprintf(stderr,
+			xlog(LOG_DEBUG,
 	"rpcbproc_callit_com:  sendto failed:  errno %d\n", errno);
 		if (reply_type == RPCBPROC_INDIRECT)
 			svcerr_systemerr(transp);
@@ -1123,15 +1123,7 @@ my_svc_run()
 		}
 		nfds = p - pollfds;
 		poll_ret = 0;
-#ifdef SVC_RUN_DEBUG
-		if (debugging) {
-			fprintf(stderr, "polling for read on fd < ");
-			for (i = 0, p = pollfds; i < nfds; i++, p++)
-				if (p->events)
-					fprintf(stderr, "%d ", p->fd);
-			fprintf(stderr, ">\n");
-		}
-#endif
+
 		switch (poll_ret = poll(pollfds, nfds, 30 * 1000)) {
 		case -1:
 			/*
@@ -1144,15 +1136,6 @@ my_svc_run()
 			__svc_clean_idle(&cleanfds, 30, FALSE);
 			continue;
 		default:
-#ifdef SVC_RUN_DEBUG
-			if (debugging) {
-				fprintf(stderr, "poll returned read fds < ");
-				for (i = 0, p = pollfds; i < nfds; i++, p++)
-					if (p->revents)
-						fprintf(stderr, "%d ", p->fd);
-				fprintf(stderr, ">\n");
-			}
-#endif
 			/*
 			 * If we found as many replies on callback fds
 			 * as the number of descriptors selectable which
@@ -1165,11 +1148,6 @@ my_svc_run()
 				continue;
 			svc_getreq_poll(pollfds, poll_ret-check_ret);
 		}
-#ifdef SVC_RUN_DEBUG
-		if (debugging) {
-			fprintf(stderr, "svc_maxfd now %u\n", svc_maxfd);
-		}
-#endif
 	}
 }
 
@@ -1189,7 +1167,7 @@ check_rmtcalls(struct pollfd *pfds, int nfds)
 				ncallbacks_found++;
 #ifdef DEBUG_RMTCALL
 			if (debugging)
-				fprintf(stderr,
+				xlog(LOG_DEBUG,
 "my_svc_run:  polled on forwarding fd %d, netid %s - calling handle_reply\n",
 		pfds[j].fd, xprt->xp_netid);
 #endif
@@ -1253,7 +1231,7 @@ handle_reply(int fd, SVCXPRT *xprt)
 	} while (inlen < 0 && errno == EINTR);
 	if (inlen < 0) {
 		if (debugging)
-			fprintf(stderr,
+			xlog(LOG_DEBUG,
 	"handle_reply:  recvfrom returned %d, errno %d\n", inlen, errno);
 		goto done;
 	}
@@ -1265,14 +1243,14 @@ handle_reply(int fd, SVCXPRT *xprt)
 	xdrmem_create(&reply_xdrs, buffer, (u_int)inlen, XDR_DECODE);
 	if (!xdr_replymsg(&reply_xdrs, &reply_msg)) {
 		if (debugging)
-			(void) fprintf(stderr,
+			(void) xlog(LOG_DEBUG,
 				"handle_reply:  xdr_replymsg failed\n");
 		goto done;
 	}
 	fi = forward_find(reply_msg.rm_xid);
 #ifdef	SVC_RUN_DEBUG
 	if (debugging) {
-		fprintf(stderr, "handle_reply:  reply xid: %d fi addr: %p\n",
+		xlog(LOG_DEBUG, "handle_reply:  reply xid: %d fi addr: %p\n",
 			reply_msg.rm_xid, fi);
 	}
 #endif
@@ -1282,7 +1260,7 @@ handle_reply(int fd, SVCXPRT *xprt)
 	_seterr_reply(&reply_msg, &reply_error);
 	if (reply_error.re_status != RPC_SUCCESS) {
 		if (debugging)
-			(void) fprintf(stderr, "handle_reply:  %s\n",
+			(void) xlog(LOG_DEBUG, "handle_reply:  %s\n",
 				clnt_sperrno(reply_error.re_status));
 		send_svcsyserr(xprt, fi);
 		goto done;
@@ -1306,7 +1284,7 @@ done:
 	if (reply_msg.rm_xid == 0) {
 #ifdef	SVC_RUN_DEBUG
 	if (debugging) {
-		fprintf(stderr, "handle_reply:  NULL xid on exit!\n");
+		xlog(LOG_DEBUG, "handle_reply:  NULL xid on exit!\n");
 	}
 #endif
 	} else
