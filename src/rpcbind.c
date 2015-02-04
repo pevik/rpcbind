@@ -230,18 +230,16 @@ main(int argc, char *argv[])
 	(void) signal(SIGUSR1, SIG_IGN);
 	(void) signal(SIGUSR2, SIG_IGN);
 
-	if (debugging) {
 #ifdef RPCBIND_DEBUG 
-		printf("rpcbind debugging enabled.");
-		if (doabort) {
-			printf("  Will abort on errors!\n");
-		} else {
-			printf("\n");
-		}
+	if (debugging) {
+		xlog(LOG_DEBUG, "debugging enabled.");
+		if (doabort)
+			xlog(LOG_DEBUG, "Will abort on errors!\n");
+	}
 #endif
-	} else if (dofork) {
+	if (dofork) {
 		if (daemon(0, 0))
-        		err(1, "fork failed");
+        	err(1, "fork failed");
 	}
 
 	if (runasdaemon || rpcbinduser) {
