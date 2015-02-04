@@ -484,7 +484,6 @@ pmapdump (argc, argv)
      char **argv;
 {
   struct pmaplist *head = NULL;
-  int socket = RPC_ANYSOCK;
   struct timeval minutetimeout;
   register CLIENT *client;
   struct rpcent *rpc;
