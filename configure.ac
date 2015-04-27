@@ -55,6 +55,6 @@ AS_IF([test x$enable_libwrap = xyes], [
 
 AC_SEARCH_LIBS([pthread_create], [pthread])
 
-AC_CHECK_HEADERS(nss.h)
+AC_CHECK_HEADERS([nss.h rpcsvc/mount.h])
 
 AC_OUTPUT([Makefile])
