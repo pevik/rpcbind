@@ -21,6 +21,7 @@ src/stamp-h2
 stamp-h1
 # file generated during compilation
 .deps
+.dirstamp
 *.o
 rpcbind
 rpcinfo
