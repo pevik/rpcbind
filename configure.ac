@@ -12,6 +12,10 @@ AM_CONDITIONAL(LIBWRAP, test x$enable_libwrap = xyes)
 AC_ARG_ENABLE([debug],
   AS_HELP_STRING([--enable-debug], [Turns on rpcbind debugging @<:@default=no@:>@]))
 AM_CONDITIONAL(DEBUG, test x$enable_debug = xyes)
+if test x"$enable_debug" = xyes; then
+	AC_CHECK_LIB([tirpc], [libtirpc_set_debug], [lib_setdebug=yes])
+fi
+AM_CONDITIONAL(LIBSETDEBUG, test x$lib_setdebug = xyes)
 
 AC_ARG_ENABLE([warmstarts],
   AS_HELP_STRING([--enable-warmstarts], [Enables Warm Starts @<:@default=no@:>@]))

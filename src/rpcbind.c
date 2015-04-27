@@ -117,6 +117,9 @@ int nhosts = 0;
 int on = 1;
 int rpcbindlockfd;
 
+#ifdef LIB_SET_DEBUG
+void  libtirpc_set_debug(char *name, int level, int use_stderr);
+#endif
 #ifdef WARMSTART
 /* Local Variable */
 static int warmstart = 0;	/* Grab an old copy of registrations. */
@@ -199,9 +202,12 @@ main(int argc, char *argv[])
 		xlog_syslog(FALSE);
 		xlog_stderr(TRUE);
 	}
-	if (debugging)
+	if (debugging) {
 		xlog_config(D_ALL, 1);
-
+#ifdef LIB_SET_DEBUG
+		libtirpc_set_debug("rpcbind", debugging, (dofork == 0));
+#endif
+	}
 	rpc_control(RPC_SVC_CONNMAXREC_SET, &maxrec);
 
 	init_transport(nconf);
@@ -870,7 +876,7 @@ parseargs(int argc, char *argv[])
 			break;		/* errors; for rpcbind developers */
 					/* only! */
 		case 'd':
-			debugging = 1;
+			debugging++;
 			break;
 		case 'h':
 			++nhosts;
