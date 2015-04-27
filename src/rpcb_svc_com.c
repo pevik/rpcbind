@@ -62,6 +62,7 @@
 #include <stdlib.h>
 
 #include "rpcbind.h"
+#include "xlog.h"
 
 #define RPC_BUF_MAX	65536	/* can be raised if required */
 

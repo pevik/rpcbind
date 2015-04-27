@@ -51,6 +51,7 @@
 #include <string.h>
 
 #include "rpcbind.h"
+#include "xlog.h"
 
 static void *rpcbproc_getaddr_3_local __P((void *, struct svc_req *, SVCXPRT *,
 					   rpcvers_t));
