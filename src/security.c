@@ -17,6 +17,8 @@
 #include <syslog.h>
 #include <netdb.h>
 
+#include "xlog.h"
+
 /*
  * XXX for special case checks in check_callit.
  */
