@@ -1295,10 +1295,17 @@ handle_reply(int fd, SVCXPRT *xprt)
 	a.rmt_localvers = fi->versnum;
 
 	xprt_set_caller(xprt, fi);
+#if defined(SVC_XP_AUTH)
+	SVC_XP_AUTH(xprt) = svc_auth_none;
+#else 
 	xprt->xp_auth = &svc_auth_none;
+#endif
 	svc_sendreply(xprt, (xdrproc_t) xdr_rmtcall_result, (char *) &a);
+#if !defined(SVC_XP_AUTH)
 	SVCAUTH_DESTROY(xprt->xp_auth);
 	xprt->xp_auth = NULL;
+#endif
+
 done:
 	if (buffer)
 		free(buffer);
