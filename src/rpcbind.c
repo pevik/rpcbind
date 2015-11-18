@@ -87,6 +87,7 @@ static inline void __nss_configure_lookup(const char *db, const char *s) {}
 int debugging = 0;	/* Tell me what's going on */
 int doabort = 0;	/* When debugging, do an abort on errors */
 int dofork = 1;		/* fork? */
+int createdsocket = 0;  /* Did I create the socket or systemd did it for me? */
 
 rpcblist_ptr list_rbl;	/* A list of version 3/4 rpcbind services */
 
@@ -445,6 +446,7 @@ init_transport(struct netconfig *nconf)
 		memset(&sun, 0, sizeof sun);
 		sun.sun_family = AF_LOCAL;
 		unlink(_PATH_RPCBINDSOCK);
+		createdsocket = 1; /* We are now in the process of creating the unix socket */
 		strcpy(sun.sun_path, _PATH_RPCBINDSOCK);
 		addrlen = SUN_LEN(&sun);
 		sa = (struct sockaddr *)&sun;
@@ -846,7 +848,8 @@ static void
 terminate(int dummy /*__unused*/)
 {
 	close(rpcbindlockfd);
-	unlink(_PATH_RPCBINDSOCK);
+	if(createdsocket)
+		unlink(_PATH_RPCBINDSOCK);
 	unlink(RPCBINDDLOCK);
 #ifdef WARMSTART
 	write_warmstart();	/* Dump yourself */
