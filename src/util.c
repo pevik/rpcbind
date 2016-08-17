@@ -70,7 +70,7 @@ static struct sockaddr_in *local_in4;
 static struct sockaddr_in6 *local_in6;
 #endif
 
-static int bitmaskcmp __P((void *, void *, void *, int));
+static int bitmaskcmp(void *, void *, void *, int);
 
 /*
  * For all bits set in "mask", compare the corresponding bits in
