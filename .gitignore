@@ -27,3 +27,4 @@ rpcbind
 rpcinfo
 # cscope database files
 cscope.*
+systemd/rpcbind.service
