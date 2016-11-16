@@ -45,17 +45,21 @@
 #include <syslog.h>
 #include <unistd.h>
 #include <errno.h>
+#include <fcntl.h>
 
 #include "rpcbind.h"
-
-#ifndef RPCBIND_STATEDIR
-#define RPCBIND_STATEDIR "/tmp"
-#endif
 
 /* These files keep the pmap_list and rpcb_list in XDR format */
 #define	RPCBFILE	RPCBIND_STATEDIR "/rpcbind.xdr"
 #ifdef PORTMAP
 #define	PMAPFILE	RPCBIND_STATEDIR "/portmap.xdr"
+#endif
+
+#ifndef O_DIRECTORY
+#define O_DIRECTORY 0
+#endif
+#ifndef O_NOFOLLOW
+#define O_NOFOLLOW 0
 #endif
 
 static bool_t write_struct(char *, xdrproc_t, void *);
@@ -139,8 +143,33 @@ error:
 }
 
 void
+mkdir_warmstart(int uid)
+{
+	/* Already exists? */
+	if (access(RPCBIND_STATEDIR, X_OK) == 0)
+		return;
+
+	if (mkdir(RPCBIND_STATEDIR, 0770) == 0) {
+		int fd = open(RPCBIND_STATEDIR, O_RDONLY | O_DIRECTORY | O_NOFOLLOW);
+		if (fd >= 0) {
+			if (fchown(fd, uid, -1) < 0) {
+				syslog(LOG_ERR, 
+					"mkdir_warmstart: open failed '%s', errno %d (%s)", 
+					RPCBIND_STATEDIR, errno, strerror(errno));
+			}
+			close(fd);
+		} else
+			syslog(LOG_ERR, "mkdir_warmstart: open failed '%s', errno %d (%s)", 
+				RPCBIND_STATEDIR, errno, strerror(errno));
+	} else
+		syslog(LOG_ERR, "mkdir_warmstart: mkdir failed '%s', errno %d (%s)", 
+			RPCBIND_STATEDIR, errno, strerror(errno));
+}
+
+void
 write_warmstart()
 {
+	(void) mkdir(RPCBIND_STATEDIR, 0770);
 	(void) write_struct(RPCBFILE, (xdrproc_t)xdr_rpcblist_ptr, &list_rbl);
 #ifdef PORTMAP
 	(void) write_struct(PMAPFILE, (xdrproc_t)xdr_pmaplist_ptr, &list_pml);

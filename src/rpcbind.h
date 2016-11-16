@@ -129,6 +129,7 @@ int is_localroot(struct netbuf *);
 extern void pmap_service(struct svc_req *, SVCXPRT *);
 #endif
 
+void mkdir_warmstart(int uid);
 void write_warmstart(void);
 void read_warmstart(void);
 

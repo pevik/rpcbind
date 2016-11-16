@@ -22,8 +22,8 @@ AC_ARG_ENABLE([warmstarts],
 AM_CONDITIONAL(WARMSTART, test x$enable_warmstarts = xyes)
 
 AC_ARG_WITH([statedir],
-  AS_HELP_STRING([--with-statedir=ARG], [use ARG as state dir @<:@default=/tmp@:>@])
-  ,, [with_statedir=/tmp])
+  AS_HELP_STRING([--with-statedir=ARG], [use ARG as state dir @<:@default=/var/run/rpcbind@:>@])
+  ,, [with_statedir=/var/run/rpcbind])
 AC_SUBST([statedir], [$with_statedir])
 
 AC_ARG_WITH([rpcuser],
