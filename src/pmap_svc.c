@@ -175,6 +175,7 @@ pmapproc_change(struct svc_req *rqstp /*__unused*/, SVCXPRT *xprt, unsigned long
 	long ans;
 	uid_t uid;
 	char uidbuf[32];
+	int rc = TRUE;
 
 	/*
 	 * Can't use getpwnam here. We might end up calling ourselves
@@ -194,7 +195,8 @@ pmapproc_change(struct svc_req *rqstp /*__unused*/, SVCXPRT *xprt, unsigned long
 
 	if (!svc_getargs(xprt, (xdrproc_t) xdr_pmap, (char *)&reg)) {
 		svcerr_decode(xprt);
-		return (FALSE);
+		rc = FALSE;
+		goto done;
 	}
 #ifdef RPCBIND_DEBUG
 	if (debugging)
@@ -205,7 +207,8 @@ pmapproc_change(struct svc_req *rqstp /*__unused*/, SVCXPRT *xprt, unsigned long
 
 	if (!check_access(xprt, op, reg.pm_prog, PMAPVERS)) {
 		svcerr_weakauth(xprt);
-		return (FALSE);
+		rc = (FALSE);
+		goto done;
 	}
 
 	rpcbreg.r_prog = reg.pm_prog;
@@ -258,7 +261,16 @@ done_change:
 		rpcbs_set(RPCBVERS_2_STAT, ans);
 	else
 		rpcbs_unset(RPCBVERS_2_STAT, ans);
-	return (TRUE);
+done:
+	if (!svc_freeargs(xprt, (xdrproc_t) xdr_pmap, (char *)&reg)) {
+		if (debugging) {
+			(void) xlog(LOG_DEBUG, "unable to free arguments\n");
+			if (doabort) {
+				rpcbind_abort();
+			}
+		}
+	}
+	return (rc);
 }
 
 /* ARGSUSED */
@@ -272,15 +284,18 @@ pmapproc_getport(struct svc_req *rqstp /*__unused*/, SVCXPRT *xprt)
 #ifdef RPCBIND_DEBUG
 	char *uaddr;
 #endif
+	int rc = TRUE;
 
 	if (!svc_getargs(xprt, (xdrproc_t) xdr_pmap, (char *)&reg)) {
 		svcerr_decode(xprt);
-		return (FALSE);
+		rc = FALSE;
+		goto done;
 	}
 
 	if (!check_access(xprt, PMAPPROC_GETPORT, reg.pm_prog, PMAPVERS)) {
 		svcerr_weakauth(xprt);
-		return FALSE;
+		rc = FALSE;
+		goto done;
 	}
 
 #ifdef RPCBIND_DEBUG
@@ -330,21 +345,34 @@ pmapproc_getport(struct svc_req *rqstp /*__unused*/, SVCXPRT *xprt)
 		pmap_ipprot2netid(reg.pm_prot) ?: "<unknown>",
 		port ? udptrans : "");
 
-	return (TRUE);
+done:
+	if (!svc_freeargs(xprt, (xdrproc_t) xdr_pmap, (char *)&reg)) {
+		if (debugging) {
+			(void) xlog(LOG_DEBUG, "unable to free arguments\n");
+			if (doabort) {
+				rpcbind_abort();
+			}
+		}
+	}
+	return (rc);
 }
 
 /* ARGSUSED */
 static bool_t
 pmapproc_dump(struct svc_req *rqstp /*__unused*/, SVCXPRT *xprt)
 {
+	int rc = TRUE;
+
 	if (!svc_getargs(xprt, (xdrproc_t)xdr_void, NULL)) {
 		svcerr_decode(xprt);
-		return (FALSE);
+		rc = FALSE;
+		goto done;
 	}
 
 	if (!check_access(xprt, PMAPPROC_DUMP, 0, PMAPVERS)) {
 		svcerr_weakauth(xprt);
-		return FALSE;
+		rc = FALSE;
+		goto done;
 	}
 	
 	if ((!svc_sendreply(xprt, (xdrproc_t) xdr_pmaplist_ptr,
@@ -354,7 +382,17 @@ pmapproc_dump(struct svc_req *rqstp /*__unused*/, SVCXPRT *xprt)
 			rpcbind_abort();
 		}
 	}
-	return (TRUE);
+
+done:
+	if (!svc_freeargs(xprt, (xdrproc_t) xdr_pmap, (char *)NULL)) {
+		if (debugging) {
+			(void) xlog(LOG_DEBUG, "unable to free arguments\n");
+			if (doabort) {
+				rpcbind_abort();
+			}
+		}
+	}
+	return (rc);
 }
 
 int pmap_netid2ipprot(const char *netid)

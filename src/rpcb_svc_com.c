@@ -927,6 +927,14 @@ error:
 	if (call_msg.rm_xid != 0)
 		(void) free_slot_by_xid(call_msg.rm_xid);
 out:
+	if (!svc_freeargs(transp, (xdrproc_t) xdr_rmtcall_args, (char *) &a)) {
+		if (debugging) {
+			(void) xlog(LOG_DEBUG, "unable to free arguments\n");
+			if (doabort) {
+				rpcbind_abort();
+			}
+		}
+	}
 	if (local_uaddr)
 		free(local_uaddr);
 	if (buf_alloc)

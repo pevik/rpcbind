@@ -218,7 +218,7 @@ rpcb_service_4(struct svc_req *rqstp, SVCXPRT *transp)
 		svcerr_decode(transp);
 		if (debugging)
 			(void) xlog(LOG_DEBUG, "rpcbind: could not decode\n");
-		return;
+		goto done;
 	}
 
 	if (rqstp->rq_proc == RPCBPROC_SET
