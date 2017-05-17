@@ -384,7 +384,7 @@ pmapproc_dump(struct svc_req *rqstp /*__unused*/, SVCXPRT *xprt)
 	}
 
 done:
-	if (!svc_freeargs(xprt, (xdrproc_t) xdr_pmap, (char *)NULL)) {
+	if (!svc_freeargs(xprt, (xdrproc_t) xdr_void, (char *)NULL)) {
 		if (debugging) {
 			(void) xlog(LOG_DEBUG, "unable to free arguments\n");
 			if (doabort) {
