@@ -263,12 +263,14 @@ done_change:
 		rpcbs_unset(RPCBVERS_2_STAT, ans);
 done:
 	if (!svc_freeargs(xprt, (xdrproc_t) xdr_pmap, (char *)&reg)) {
+#ifdef RPCBIND_DEBUG
 		if (debugging) {
 			(void) xlog(LOG_DEBUG, "unable to free arguments\n");
 			if (doabort) {
 				rpcbind_abort();
 			}
 		}
+#endif
 	}
 	return (rc);
 }
@@ -347,12 +349,14 @@ pmapproc_getport(struct svc_req *rqstp /*__unused*/, SVCXPRT *xprt)
 
 done:
 	if (!svc_freeargs(xprt, (xdrproc_t) xdr_pmap, (char *)&reg)) {
+#ifdef RPCBIND_DEBUG
 		if (debugging) {
 			(void) xlog(LOG_DEBUG, "unable to free arguments\n");
 			if (doabort) {
 				rpcbind_abort();
 			}
 		}
+#endif
 	}
 	return (rc);
 }
@@ -385,12 +389,14 @@ pmapproc_dump(struct svc_req *rqstp /*__unused*/, SVCXPRT *xprt)
 
 done:
 	if (!svc_freeargs(xprt, (xdrproc_t) xdr_void, (char *)NULL)) {
+#ifdef RPCBIND_DEBUG
 		if (debugging) {
 			(void) xlog(LOG_DEBUG, "unable to free arguments\n");
 			if (doabort) {
 				rpcbind_abort();
 			}
 		}
+#endif
 	}
 	return (rc);
 }
