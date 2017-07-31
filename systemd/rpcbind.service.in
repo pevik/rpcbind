@@ -12,7 +12,7 @@ After=rpcbind.socket
 [Service]
 Type=notify
 # distro can provide a drop-in adding EnvironmentFile=-/??? if needed.
-ExecStart=@_bindir@/rpcbind $RPCBIND_OPTIONS -w -f
+ExecStart=@_sbindir@/rpcbind $RPCBIND_OPTIONS -w -f
 
 [Install]
 WantedBy=multi-user.target

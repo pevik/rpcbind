@@ -61,9 +61,9 @@ AC_SEARCH_LIBS([pthread_create], [pthread])
 
 AC_CHECK_HEADERS([nss.h rpcsvc/mount.h])
 
-# make bindir available for substitution in config file
+# make sbindir available for substitution in config file
 # 2 "evals" needed to expand variable names
-AC_SUBST([_bindir])
-AC_CONFIG_COMMANDS_PRE([eval eval _bindir=$bindir])
+AC_SUBST([_sbindir])
+AC_CONFIG_COMMANDS_PRE([eval eval _sbindir=$sbindir])
 
 AC_OUTPUT([Makefile systemd/rpcbind.service])

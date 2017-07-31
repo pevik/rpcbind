@@ -29,7 +29,8 @@ if LIBWRAP
 AM_CPPFLAGS +=	-DLIBWRAP
 endif
 
-bin_PROGRAMS = rpcbind rpcinfo
+bin_PROGRAMS = rpcinfo
+sbin_PROGRAMS = rpcbind
 
 rpcbind_SOURCES = \
 	src/check_bound.c \
