@@ -1052,7 +1052,6 @@ void
 my_svc_run()
 {
 	int poll_ret, check_ret;
-	int n;
 
 	for (;;) {
 	        struct pollfd my_pollfd[svc_max_pollfd];
