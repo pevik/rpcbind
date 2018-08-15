@@ -21,6 +21,10 @@ AC_ARG_ENABLE([warmstarts],
   AS_HELP_STRING([--enable-warmstarts], [Enables Warm Starts @<:@default=no@:>@]))
 AM_CONDITIONAL(WARMSTART, test x$enable_warmstarts = xyes)
 
+AC_ARG_ENABLE([rmtcalls],
+  AS_HELP_STRING([--enable-rmtcalls], [Enables Remote Calls @<:@default=no@:>@]))
+AM_CONDITIONAL(RMTCALLS, test x$enable_rmtcalls = xyes)
+
 AC_ARG_WITH([statedir],
   AS_HELP_STRING([--with-statedir=ARG], [use ARG as state dir @<:@default=/var/run/rpcbind@:>@])
   ,, [with_statedir=/var/run/rpcbind])

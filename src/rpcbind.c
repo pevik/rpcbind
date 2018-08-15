@@ -794,12 +794,14 @@ got_socket:
 		}
 	}
 #endif
+
+
+#ifdef RMTCALLS
 	/*
 	 * rmtcall only supported on CLTS transports for now.
 	 */
 	if (nconf->nc_semantics == NC_TPI_CLTS) {
 		status = create_rmtcall_fd(nconf);
-
 #ifdef RPCBIND_DEBUG
 		if (debugging) {
 			if (status < 0) {
@@ -813,6 +815,8 @@ got_socket:
 		}
 #endif
 	}
+#endif
+
 	return (0);
 error:
 	close(fd);

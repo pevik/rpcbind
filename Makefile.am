@@ -29,6 +29,10 @@ if LIBWRAP
 AM_CPPFLAGS +=	-DLIBWRAP
 endif
 
+if RMTCALLS
+AM_CPPFLAGS +=	-DRMTCALLS
+endif
+
 bin_PROGRAMS = rpcinfo
 sbin_PROGRAMS = rpcbind
 
