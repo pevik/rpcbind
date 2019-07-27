@@ -339,7 +339,7 @@ init_transport(struct netconfig *nconf)
 {
 	int fd = -1;
 	struct t_bind taddr;
-	struct addrinfo hints, *res;
+	struct addrinfo hints, *res = NULL;
 	struct __rpc_sockinfo si;
 	SVCXPRT	*my_xprt = NULL;
 	int status;	/* bound checking ? */
@@ -816,8 +816,12 @@ got_socket:
 	}
 #endif
 
+	if (res != NULL)
+		freeaddrinfo(res);
 	return (0);
 error:
+	if (res != NULL)
+		freeaddrinfo(res);
 	close(fd);
 	return (1);
 }
