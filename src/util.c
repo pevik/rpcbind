@@ -344,9 +344,10 @@ network_init()
 	/*
 	 * Now join the RPC ipv6 multicast group on all interfaces.
 	 */
-	if (getifaddrs(&ifp) < 0)
+	if (getifaddrs(&ifp) < 0) {
+		freeaddrinfo (res);
 		return;
-
+	}
 	mreq6.ipv6mr_interface = 0;
 	inet_pton(AF_INET6, RPCB_MULTICAST_ADDR, &mreq6.ipv6mr_multiaddr);
 
@@ -374,8 +375,8 @@ network_init()
 				perror("setsockopt v6 multicast");
 	}
 #endif
-
-	/* close(s); */
+	freeaddrinfo (res);
+	close(s);
 }
 
 struct sockaddr *
