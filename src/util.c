@@ -103,7 +103,7 @@ char *
 addrmerge(struct netbuf *caller, char *serv_uaddr, char *clnt_uaddr,
 	  char *netid)
 {
-	struct ifaddrs *ifap, *ifp = NULL, *bestif;
+	struct ifaddrs *ifap, *ifp = NULL, *bestif, *exactif;
 	struct netbuf *serv_nbp = NULL, *hint_nbp = NULL, tbuf;
 	struct sockaddr *caller_sa, *hint_sa, *ifsa, *ifmasksa, *serv_sa;
 	struct sockaddr_storage ss;
@@ -157,7 +157,10 @@ addrmerge(struct netbuf *caller, char *serv_uaddr, char *clnt_uaddr,
 	 * network portion of its address is equal to that of the client.
 	 * If so, we have found the interface that we want to use.
 	 */
-	bestif = NULL;
+	bestif = NULL;  /* first interface UP with same network & family */
+	exactif = NULL; /* the interface requested by the client */
+	u_int8_t maskAllAddrBits[16] = {0xff, 0xff, 0xff, 0xff,  0xff, 0xff, 0xff, 0xff,
+					0xff, 0xff, 0xff, 0xff,  0xff, 0xff, 0xff, 0xff}; /* 16 bytes for IPv6 */
 	for (ifap = ifp; ifap != NULL; ifap = ifap->ifa_next) {
 		ifsa = ifap->ifa_addr;
 		ifmasksa = ifap->ifa_netmask;
@@ -175,8 +178,16 @@ addrmerge(struct netbuf *caller, char *serv_uaddr, char *clnt_uaddr,
 			if (!bitmaskcmp(&SA2SINADDR(ifsa),
 			    &SA2SINADDR(hint_sa), &SA2SINADDR(ifmasksa),
 			    sizeof(struct in_addr))) {
-				bestif = ifap;
-				goto found;
+				if(!bestif) /* for compatibility with previous code */
+				    bestif = ifap;
+				/* Is this an exact match? */
+			        if (!bitmaskcmp(&SA2SINADDR(ifsa),
+			            &SA2SINADDR(hint_sa), maskAllAddrBits,
+			            sizeof(struct in_addr))) {
+				    exactif = ifap;
+				    goto found;
+				}
+				/* else go-on looking for an exact match */
 			}
 			break;
 #ifdef INET6
@@ -197,8 +208,16 @@ addrmerge(struct netbuf *caller, char *serv_uaddr, char *clnt_uaddr,
 			} else if (!bitmaskcmp(&SA2SIN6ADDR(ifsa),
 			    &SA2SIN6ADDR(hint_sa), &SA2SIN6ADDR(ifmasksa),
 			    sizeof(struct in6_addr))) {
-				bestif = ifap;
-				goto found;
+				if(!bestif) /* for compatibility with previous code */
+				    bestif = ifap;
+				/* Is this an exact match? */
+			        if (!bitmaskcmp(&SA2SIN6ADDR(ifsa),
+			            &SA2SIN6ADDR(hint_sa), maskAllAddrBits,
+			            sizeof(struct in6_addr))) {
+				    exactif = ifap;
+				    goto found;
+				}
+				/* else go-on looking for an exact match */
 			}
 			break;
 #endif
@@ -215,10 +234,13 @@ addrmerge(struct netbuf *caller, char *serv_uaddr, char *clnt_uaddr,
 		    (bestif->ifa_flags & (IFF_LOOPBACK | IFF_POINTOPOINT))))
 			bestif = ifap;
 	}
+
 	if (bestif == NULL)
 		goto freeit;
 
 found:
+	if(exactif)
+	    bestif = exactif;
 	/*
 	 * Construct the new address using the the address from
 	 * `bestif', and the port number from `serv_uaddr'.
