@@ -42,11 +42,10 @@
 
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <sys/errno.h>
 #include <sys/resource.h>
 #include <sys/wait.h>
 #include <sys/time.h>
-#include <sys/signal.h>
+#include <signal.h>
 #include <sys/file.h>
 #include <sys/socket.h>
 #include <sys/un.h>

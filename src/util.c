@@ -45,7 +45,7 @@
 #include <net/if.h>
 #include <netinet/in.h>
 #include <ifaddrs.h>
-#include <sys/poll.h>
+#include <poll.h>
 #include <rpc/rpc.h>
 #include <errno.h>
 #include <stdlib.h>
