@@ -693,11 +693,11 @@ reply_proc (res, who, nconf)
     }
   if (!(uaddr = taddr2uaddr (nconf, who)))
     {
-      uaddr = UNKNOWN;
+      printf ("%s\t%s\n", UNKNOWN, hostname);
+    } else {
+      printf ("%s\t%s\n", uaddr, hostname);
+      free ((char *) uaddr);
     }
-  printf ("%s\t%s\n", uaddr, hostname);
-  if (strcmp (uaddr, UNKNOWN))
-    free ((char *) uaddr);
   return (FALSE);
 }
 
