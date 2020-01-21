@@ -63,10 +63,7 @@ AS_IF([test x$enable_libwrap = xyes], [
 
 AC_SEARCH_LIBS([pthread_create], [pthread])
 
-SAVE_CPPFLAGS="$CPPFLAGS"
-CPPFLAGS="$CPPFLAGS $TIRPC_CFLAGS"
-AC_CHECK_HEADERS([nss.h rpcsvc/mount.h])
-CPPFLAGS="$SAVE_CPPFLAGS"
+AC_CHECK_HEADERS([nss.h])
 
 # make sbindir available for substitution in config file
 # 2 "evals" needed to expand variable names

@@ -22,29 +22,20 @@
 /*
  * XXX for special case checks in check_callit.
  */
-#ifdef HAVE_RPCSVC_MOUNT_H
-#include <rpcsvc/mount.h>
-#include <rpcsvc/rquota.h>
-#include <rpcsvc/nfs_prot.h>
-#include <rpcsvc/yp.h>
-#include <rpcsvc/ypclnt.h>
-#include <rpcsvc/yppasswd.h>
-#else
-# define MOUNTPROC_MNT	1
-# define MOUNTPROC_UMNT	3
-# define NFS_PROGRAM	100003
-# define YPPROG		100004
-# define MOUNTPROG	100005
-# define YPBINDPROG	100007
-# define YPPASSWDPROG	100009
-# define RQUOTAPROG	100011
+#define MOUNTPROC_MNT	1
+#define MOUNTPROC_UMNT	3
+#define NFS_PROGRAM	100003
+#define YPPROG		100004
+#define MOUNTPROG	100005
+#define YPBINDPROG	100007
+#define YPPASSWDPROG	100009
+#define RQUOTAPROG	100011
 
-# define YPBINDPROC_SETDOM	2
-# define YPPROC_MATCH	3
-# define YPPROC_FIRST	4
-# define YPPROC_NEXT	5
-# define YPPROC_ALL	8
-#endif
+#define YPBINDPROC_SETDOM	2
+#define YPPROC_MATCH	3
+#define YPPROC_FIRST	4
+#define YPPROC_NEXT	5
+#define YPPROC_ALL	8
 
 #include "rpcbind.h"
 
