@@ -352,6 +352,12 @@ network_init()
 	inet_pton(AF_INET6, RPCB_MULTICAST_ADDR, &mreq6.ipv6mr_multiaddr);
 
 	s = socket(AF_INET6, SOCK_DGRAM, IPPROTO_UDP);
+	if (s < 0) {
+	    if (debugging)
+		    fprintf(stderr, "socket(AF_INET6) failed: %s\n", strerror(errno));
+	    freeaddrinfo (res);
+	    return;
+	}
 
 	/*
 	 * Loop through all interfaces. For each IPv6 multicast-capable
@@ -374,9 +380,9 @@ network_init()
 			if (debugging)
 				perror("setsockopt v6 multicast");
 	}
+	close(s);
 #endif
 	freeaddrinfo (res);
-	close(s);
 }
 
 struct sockaddr *
