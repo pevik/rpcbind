@@ -145,7 +145,7 @@ is_loopback(struct netbuf *nbuf)
 #ifdef RPCBIND_DEBUG
 		if (debugging)
 			  xlog(LOG_DEBUG,
-				  "Checking caller's adress (port = %d)\n",
+				  "Checking caller's address (port = %d)\n",
 				  ntohs(sin->sin_port));
 #endif
 	       	return (sin->sin_addr.s_addr == htonl(INADDR_LOOPBACK));
@@ -157,7 +157,7 @@ is_loopback(struct netbuf *nbuf)
 #ifdef RPCBIND_DEBUG
 		if (debugging)
 			  xlog(LOG_DEBUG,
-				  "Checking caller's adress (port = %d)\n",
+				  "Checking caller's address (port = %d)\n",
 				  ntohs(sin6->sin6_port));
 #endif
 		return (IN6_IS_ADDR_LOOPBACK(&sin6->sin6_addr) ||
