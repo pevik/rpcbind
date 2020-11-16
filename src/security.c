@@ -346,7 +346,7 @@ deny:
 	logit(deny_severity, sa, args->rmt_proc, args->rmt_prog,
 	    ": indirect call not allowed");
 #else
-	logit(0, sa, args->rmt_proc, args->rmt_prog,
+	logit(LOG_AUTH|LOG_WARNING, sa, args->rmt_proc, args->rmt_prog,
 	    ": indirect call not allowed");
 #endif
 	return 0;
