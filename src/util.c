@@ -309,7 +309,7 @@ network_init()
 	int s;
 #endif
 	int ecode;
-	struct addrinfo hints, *res;
+	struct addrinfo hints, *res = NULL;
 
 	memset(&hints, 0, sizeof hints);
 	hints.ai_family = AF_INET;
