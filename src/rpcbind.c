@@ -552,8 +552,10 @@ init_transport(struct netconfig *nconf)
 				syslog(LOG_ERR, "cannot bind %s on %s: %m",
 					(hosts[nhostsbak] == NULL) ? "*" :
 					hosts[nhostsbak], nconf->nc_netid);
-				if (res != NULL)
+				if (res != NULL) {
 					freeaddrinfo(res);
+					res = NULL;
+				}
 				continue;
 			} else
 				checkbind++;
