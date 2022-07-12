@@ -20,6 +20,12 @@ AM_CONDITIONAL(LIBSETDEBUG, test x$lib_setdebug = xyes)
 AC_ARG_ENABLE([warmstarts],
   AS_HELP_STRING([--enable-warmstarts], [Enables Warm Starts @<:@default=no@:>@]))
 AM_CONDITIONAL(WARMSTART, test x$enable_warmstarts = xyes)
+AS_IF([test x$enable_warmstarts = xyes], [
+	warmstarts_opt=-w
+], [
+	warmstarts_opt=
+])
+AC_SUBST([warmstarts_opt], [$warmstarts_opt])
 
 AC_ARG_ENABLE([rmtcalls],
   AS_HELP_STRING([--enable-rmtcalls], [Enables Remote Calls @<:@default=no@:>@]))
