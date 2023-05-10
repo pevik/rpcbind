@@ -50,6 +50,17 @@ AC_SUBST([nss_modules], [$with_nss_modules])
 
 PKG_CHECK_MODULES([TIRPC], [libtirpc])
 
+CPPFLAGS=$TIRPC_CFLAGS
+AC_MSG_CHECKING([for abstract socket support in libtirpc])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([
+#include <rpc/rpc.h>
+],[
+char *path = _PATH_RPCBINDSOCK_ABSTRACT;
+])], [have_abstract=yes], [have_abstract=no])
+CPPFLAGS=
+AC_MSG_RESULT([$have_abstract])
+AM_CONDITIONAL(ABSTRACT, [ test "x$have_abstract" = "xyes" ])
+
 PKG_PROG_PKG_CONFIG
 AC_ARG_WITH([systemdsystemunitdir],
   AS_HELP_STRING([--with-systemdsystemunitdir=DIR], [Directory for systemd service files]),
@@ -76,4 +87,4 @@ AC_CHECK_HEADERS([nss.h])
 AC_SUBST([_sbindir])
 AC_CONFIG_COMMANDS_PRE([eval eval _sbindir=$sbindir])
 
-AC_OUTPUT([Makefile systemd/rpcbind.service])
+AC_OUTPUT([Makefile systemd/rpcbind.service systemd/rpcbind.socket])
