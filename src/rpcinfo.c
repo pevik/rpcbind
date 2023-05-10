@@ -311,6 +311,13 @@ main (int argc, char **argv)
   return (0);
 }
 
+/* Evaluate to actual length of the `sockaddr_un' structure, whether
+ * abstract or not.
+ */
+#include <stddef.h>
+#define SUN_LEN_A(ptr) (offsetof(struct sockaddr_un, sun_path)	\
+			+ 1 + strlen((ptr)->sun_path + 1))
+
 static CLIENT *
 local_rpcb (rpcprog_t prog, rpcvers_t vers)
 {
@@ -334,6 +341,7 @@ local_rpcb (rpcprog_t prog, rpcvers_t vers)
   endnetconfig(localhandle);
   return clnt;
 #else
+  CLIENT *clnt;
   struct netbuf nbuf;
   struct sockaddr_un sun;
   int sock;
@@ -344,12 +352,26 @@ local_rpcb (rpcprog_t prog, rpcvers_t vers)
     return NULL;
 
   sun.sun_family = AF_LOCAL;
+
+#ifdef _PATH_RPCBINDSOCK_ABSTRACT
+  memcpy(sun.sun_path, _PATH_RPCBINDSOCK_ABSTRACT,
+         sizeof(_PATH_RPCBINDSOCK_ABSTRACT));
+  nbuf.len = SUN_LEN_A (&sun);
+  nbuf.maxlen = sizeof (struct sockaddr_un);
+  nbuf.buf = &sun;
+
+  clnt = clnt_vc_create (sock, &nbuf, prog, vers, 0, 0);
+  if (clnt)
+    return clnt;
+#endif
+
   strcpy (sun.sun_path, _PATH_RPCBINDSOCK);
   nbuf.len = SUN_LEN (&sun);
   nbuf.maxlen = sizeof (struct sockaddr_un);
   nbuf.buf = &sun;
 
-  return clnt_vc_create (sock, &nbuf, prog, vers, 0, 0);
+  clnt = clnt_vc_create (sock, &nbuf, prog, vers, 0, 0);
+  return clnt;
 #endif
 }
 
