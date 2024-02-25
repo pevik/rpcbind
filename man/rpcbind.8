@@ -66,6 +66,25 @@ reports the condition and terminates.
 The
 .Nm
 utility can only be started by the super-user.
+.Sh "BROADCAST RPC"
+.Nm
+supports a little-used part of the ONC-RPC specification known as
+Broadcast RPC.
+A client can send a UDP broadcast message to
+.Nm
+on every host on a local subnetwork, and each
+.Nm
+will forward the request to the local service if available.
+Should the service reply,
+.Nm
+will forward that reply back to the originator.
+To support this,
+.Nm
+creates an extra UDP socket bound to an arbitrary privileged port
+number, and uses it to forward requests to local services and to
+receive replies from them.
+When configuring a firewall, the "port 111" sockets may need to
+be accessible through the firewall, but the extra UDP socket does not.
 .Sh OPTIONS
 .Bl -tag -width indent
 .It Fl a
