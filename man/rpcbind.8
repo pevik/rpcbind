@@ -103,6 +103,11 @@ With this option, the name-to-address translation consistency
 checks are shown in detail.
 .It Fl f
 Do not fork and become a background process.
+.It Fl b
+Do not support broadcast RPC and do not bind the extra port.
+This is useful if
+.Nm
+inadvertently binds a port that some other service needs to use.
 .It Fl h
 Specify specific IP addresses to bind to for UDP requests.
 This option may be specified multiple times and can be used to

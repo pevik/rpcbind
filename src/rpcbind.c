@@ -87,6 +87,7 @@ int debugging = 0;	/* Tell me what's going on */
 int doabort = 0;	/* When debugging, do an abort on errors */
 int dofork = 1;		/* fork? */
 int createdsocket = 0;  /* Did I create the socket or systemd did it for me? */
+int dobroadcast = 1;	/* Support forwarding of broadcast RPC calls (CALLIT) */
 
 rpcblist_ptr list_rbl;	/* A list of version 3/4 rpcbind services */
 
@@ -801,7 +802,7 @@ got_socket:
 	/*
 	 * rmtcall only supported on CLTS transports for now.
 	 */
-	if (nconf->nc_semantics == NC_TPI_CLTS) {
+	if (dobroadcast && nconf->nc_semantics == NC_TPI_CLTS) {
 		status = create_rmtcall_fd(nconf);
 #ifdef RPCBIND_DEBUG
 		if (debugging) {
@@ -886,7 +887,7 @@ parseargs(int argc, char *argv[])
 {
 	int c;
 	oldstyle_local = 1;
-	while ((c = getopt(argc, argv, "adh:ilswf")) != -1) {
+	while ((c = getopt(argc, argv, "adh:ilswfb")) != -1) {
 		switch (c) {
 		case 'a':
 			doabort = 1;	/* when debugging, do an abort on */
@@ -921,8 +922,11 @@ parseargs(int argc, char *argv[])
 			warmstart = 1;
 			break;
 #endif
+		case 'b':
+			dobroadcast = 0;
+			break;
 		default:	/* error */
-			fprintf(stderr,	"usage: rpcbind [-adhilswf]\n");
+			fprintf(stderr,	"usage: rpcbind [-adhilswfb]\n");
 			exit (1);
 		}
 	}
